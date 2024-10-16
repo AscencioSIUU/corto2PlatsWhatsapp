@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "733858657499",
+    "project_id": "privatechat-uvg",
+    "storage_bucket": "privatechat-uvg.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:733858657499:android:3ae55229e286ca42f488fe",
+        "android_client_info": {
+          "package_name": "com.example.privatechatplats"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBilDebHce9f8q4j9bv1oCw8DMcKWjdVLw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
