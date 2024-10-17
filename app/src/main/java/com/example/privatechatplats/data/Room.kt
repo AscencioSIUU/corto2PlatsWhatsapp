@@ -1,0 +1,6 @@
+package com.example.privatechatplats.data
+
+data class Room (
+    val id: String = "",
+    val name: String = ""
+)
