@@ -1,38 +1,44 @@
 package com.example.privatechatplats.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.example.privatechatplats.Injection
 import com.example.privatechatplats.data.Message
 import com.example.privatechatplats.data.MessageRepository
-import com.example.privatechatplats.data.Result.*
+import com.example.privatechatplats.data.Result
 import com.example.privatechatplats.data.User
 import com.example.privatechatplats.data.UserRepository
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+
 class MessageViewModel : ViewModel() {
     private val messageRepository: MessageRepository
     private val userRepository: UserRepository
+
     init {
-        messageRepository = MessageRepository(Injection.instance())
-        userRepository = UserRepository(
-            FirebaseAuth.getInstance(),
-            Injection.instance()
-        )
+        messageRepository = MessageRepository(FirebaseFirestore.getInstance())
+        userRepository = UserRepository(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance())
         loadCurrentUser()
     }
+
     private val _messages = MutableLiveData<List<Message>>()
     val messages: LiveData<List<Message>> get() = _messages
-    private val _roomId = MutableLiveData<String>()
+
     private val _currentUser = MutableLiveData<User>()
     val currentUser: LiveData<User> get() = _currentUser
-    fun setRoomId(roomId: String) {
-        _roomId.value = roomId
+
+    private var currentUserId: String = ""
+    private var otherUserId: String = ""
+
+    fun setUserIds(currentUserId: String, otherUserId: String) {
+        this.currentUserId = currentUserId
+        this.otherUserId = otherUserId
         loadMessages()
     }
+
     fun sendMessage(text: String) {
         if (_currentUser.value != null) {
             val message = Message(
@@ -41,27 +47,32 @@ class MessageViewModel : ViewModel() {
                 text = text
             )
             viewModelScope.launch {
-                when (messageRepository.sendMessage(_roomId.value.toString(), message)) {
-                    is Success -> Unit
-                    is Error -> {
+                when (messageRepository.sendMessage(currentUserId, otherUserId, message)) {
+                    is Result.Success -> Unit
+                    is Result.Error -> {
+                        // Handle error if needed
                     }
                 }
             }
         }
     }
+
     fun loadMessages() {
         viewModelScope.launch {
-            if (_roomId != null) {
-                messageRepository.getChatMessages(_roomId.value.toString())
-                    .collect { _messages.value = it }
+            if (currentUserId.isNotBlank() && otherUserId.isNotBlank()) {
+                messageRepository.getChatMessages(currentUserId, otherUserId).collect {
+                    _messages.value = it
+                }
             }
         }
     }
+
     private fun loadCurrentUser() {
         viewModelScope.launch {
             when (val result = userRepository.getCurrentUser()) {
-                is Success -> _currentUser.value = result.data
-                is Error -> {
+                is Result.Success -> _currentUser.value = result.data
+                is Result.Error -> {
+                    // Handle error
                 }
             }
         }
