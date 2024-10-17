@@ -18,13 +18,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import edu.uvg.uvgchatejemplo.screen.ChatRoomListScreen
-import edu.uvg.uvgchatejemplo.screen.ChatScreen
-import edu.uvg.uvgchatejemplo.screen.Screen
-import edu.uvg.uvgchatejemplo.screen.SignUpScreen
-import edu.uvg.uvgchatejemplo.screen.LoginScreen
-import edu.uvg.uvgchatejemplo.ui.theme.UVGChatEjemploTheme
-import edu.uvg.uvgchatejemplo.viewmodel.AuthViewModel
+import com.example.privatechatplats.screen.ChatRoomListScreen
+import com.example.privatechatplats.screen.ChatScreen
+import com.example.privatechatplats.screen.Screen
+import com.example.privatechatplats.screen.SignUpScreen
+import com.example.privatechatplats.screen.LoginScreen
+import com.example.privatechatplats.ui.theme.PrivateChatPlatsTheme
+import com.example.privatechatplats.viewmodel.AuthViewModel
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
 
             val navController = rememberNavController()
             val authViewModel: AuthViewModel = viewModel()
-            UVGChatEjemploTheme {
+            PrivateChatPlatsTheme {
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     // A surface container using the 'background' color from the theme

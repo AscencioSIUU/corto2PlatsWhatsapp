@@ -23,8 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.privatechatplats.viewmodel
-import ed.uvg.uvgchatejemplo.data.Result
+import com.example.privatechatplats.viewmodel.AuthViewModel
+import com.example.privatechatplats.data.Result
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
