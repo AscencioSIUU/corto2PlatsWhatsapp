@@ -4,7 +4,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,7 +17,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.privatechatplats.screen.ChatRoomListScreen
 import com.example.privatechatplats.screen.ChatScreen
 import com.example.privatechatplats.screen.Screen
 import com.example.privatechatplats.screen.SignUpScreen
@@ -30,7 +28,6 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
 
             val navController = rememberNavController()
@@ -38,7 +35,6 @@ class MainActivity : ComponentActivity() {
             PrivateChatPlatsTheme {
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    // A surface container using the 'background' color from the theme
                     Surface(
                         modifier = Modifier.padding(innerPadding),
                         color = MaterialTheme.colorScheme.background
@@ -61,7 +57,7 @@ fun NavigationGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.LoginScreen.route
+        startDestination = Screen.LoginScreen.route // Start with the login screen
     ) {
         composable(Screen.SignupScreen.route) {
             SignUpScreen(
@@ -71,21 +67,15 @@ fun NavigationGraph(
         }
         composable(Screen.LoginScreen.route) {
             LoginScreen(
-                authViewModel = authViewModel
-                ,onNavigateToSignUp = { navController.navigate(Screen.SignupScreen.route) }
-                , onSignInSuccess = { navController.navigate(Screen.ChatRoomsScreen.route) }
+                authViewModel = authViewModel,
+                onNavigateToSignUp = { navController.navigate(Screen.SignupScreen.route) },
+                onSignInSuccess = { navController.navigate(Screen.ChatScreen.route) }
             )
         }
-        composable(Screen.ChatRoomsScreen.route) {
-            ChatRoomListScreen (
-                onJoinClicked = { navController.navigate("${Screen.ChatScreen.route}/${it.id}") }
-            )
-        }
-
-        composable("${Screen.ChatScreen.route}/{roomId}") {
-            val roomId: String = it
-                .arguments?.getString("roomId") ?: ""
-            ChatScreen(roomId = roomId)
+        composable("${Screen.ChatScreen.route}/{otherUserId}") {
+            val otherUserId: String = it.arguments?.getString("otherUserId") ?: ""
+            ChatScreen(currentUserId = authViewModel.currentUser.value?.email ?: "", otherUserId = otherUserId)
         }
     }
 }
+

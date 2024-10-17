@@ -10,6 +10,7 @@ import com.example.privatechatplats.data.MessageRepository
 import com.example.privatechatplats.data.Result
 import com.example.privatechatplats.data.User
 import com.example.privatechatplats.data.UserRepository
+import com.example.privatechatplats.data.cesarCipher
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -41,16 +42,17 @@ class MessageViewModel : ViewModel() {
 
     fun sendMessage(text: String) {
         if (_currentUser.value != null) {
+            val encryptedText = cesarCipher(text, shift = 3)  // Cifrar el mensaje con el desplazamiento deseado
             val message = Message(
                 senderFirstName = _currentUser.value!!.firstName,
                 senderId = _currentUser.value!!.email,
-                text = text
+                text = encryptedText  // Enviar el mensaje cifrado
             )
             viewModelScope.launch {
                 when (messageRepository.sendMessage(currentUserId, otherUserId, message)) {
                     is Result.Success -> Unit
                     is Result.Error -> {
-                        // Handle error if needed
+                        // Manejar el error si es necesario
                     }
                 }
             }

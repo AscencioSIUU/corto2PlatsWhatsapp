@@ -25,7 +25,9 @@ class MessageRepository(private val firestore: FirebaseFirestore) {
             .addSnapshotListener { querySnapshot, _ ->
                 querySnapshot?.let {
                     trySend(it.documents.map { doc ->
-                        doc.toObject(Message::class.java)!!.copy()
+                        val message = doc.toObject(Message::class.java)!!.copy()
+                        val decryptedText = cesarCipher(message.text, shift = -3)  // Desencriptar el mensaje
+                        message.copy(text = decryptedText)
                     }).isSuccess
                 }
             }
@@ -33,6 +35,6 @@ class MessageRepository(private val firestore: FirebaseFirestore) {
     }
 
     private fun generateChatId(user1Id: String, user2Id: String): String {
-        return if (user1Id < user2Id) "$user1Id_$user2Id" else "$user2Id_$user1Id"
+        return if (user1Id < user2Id) "${user1Id}_${user2Id}" else "${user2Id}_${user1Id}"
     }
 }
