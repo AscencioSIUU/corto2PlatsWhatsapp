@@ -18,9 +18,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.privatechatplats.screen.ChatScreen
-import com.example.privatechatplats.screen.Screen
-import com.example.privatechatplats.screen.SignUpScreen
 import com.example.privatechatplats.screen.LoginScreen
+import com.example.privatechatplats.screen.SignUpScreen
+import com.example.privatechatplats.screen.Screen
+import com.example.privatechatplats.screen.UserListScreen
 import com.example.privatechatplats.ui.theme.PrivateChatPlatsTheme
 import com.example.privatechatplats.viewmodel.AuthViewModel
 
@@ -29,22 +30,20 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
             val navController = rememberNavController()
             val authViewModel: AuthViewModel = viewModel()
-            PrivateChatPlatsTheme {
 
+            PrivateChatPlatsTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Surface(
                         modifier = Modifier.padding(innerPadding),
                         color = MaterialTheme.colorScheme.background
                     ) {
+                        // Llamar al NavigationGraph
                         NavigationGraph(navController = navController, authViewModel = authViewModel)
                     }
                 }
-
             }
-
         }
     }
 }
@@ -57,24 +56,33 @@ fun NavigationGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.LoginScreen.route // Start with the login screen
+        startDestination = Screen.LoginScreen.route
     ) {
+        composable(Screen.LoginScreen.route) {
+            LoginScreen(
+                authViewModel = authViewModel,
+                onNavigateToSignUp = { navController.navigate(Screen.SignupScreen.route) },
+                onSignInSuccess = { navController.navigate(Screen.UserListScreen.route) } // Redirigir a UserListScreen
+            )
+        }
         composable(Screen.SignupScreen.route) {
             SignUpScreen(
                 authViewModel = authViewModel,
                 onNavigateToLogin = { navController.navigate(Screen.LoginScreen.route) }
             )
         }
-        composable(Screen.LoginScreen.route) {
-            LoginScreen(
-                authViewModel = authViewModel,
-                onNavigateToSignUp = { navController.navigate(Screen.SignupScreen.route) },
-                onSignInSuccess = { navController.navigate(Screen.ChatScreen.route) }
-            )
+        composable(Screen.UserListScreen.route) {
+            UserListScreen(onUserClick = { selectedUser ->
+                // Al seleccionar un usuario, navegamos a la pantalla de chat
+                navController.navigate("${Screen.ChatScreen.route}/${selectedUser.email}")
+            })
         }
-        composable("${Screen.ChatScreen.route}/{otherUserId}") {
-            val otherUserId: String = it.arguments?.getString("otherUserId") ?: ""
-            ChatScreen(currentUserId = authViewModel.currentUser.value?.email ?: "", otherUserId = otherUserId)
+        composable("${Screen.ChatScreen.route}/{otherUserId}") { backStackEntry ->
+            val otherUserId: String = backStackEntry.arguments?.getString("otherUserId") ?: ""
+            ChatScreen(
+                currentUserId = authViewModel.currentUser.value?.email ?: "",
+                otherUserId = otherUserId
+            )
         }
     }
 }

@@ -57,4 +57,15 @@ class UserRepository (
     } catch (e: Exception) {
         Result.Error(e)
     }
+    suspend fun getAllUsers(): Result<List<User>> = try {
+        val querySnapshot = firestore.collection("users").get().await()
+        val userList = querySnapshot.documents.map { document ->
+            document.toObject(User::class.java)!!
+        }
+        Result.Success(userList)
+    } catch (e: Exception) {
+        Result.Error(e)
+    }
+
+
 }

@@ -10,12 +10,28 @@ import androidx.compose.runtime.mutableStateOf
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.example.privatechatplats.Injection
+import com.example.privatechatplats.data.User
 import com.example.privatechatplats.data.UserRepository
 import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
     private val userRepository: UserRepository
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
+    private val _users = MutableLiveData<List<User>>()
+    val users: LiveData<List<User>> get() = _users
+
+    fun loadAllUsers() {
+        viewModelScope.launch {
+            when (val result = userRepository.getAllUsers()) {
+                is Result.Success -> _users.value = result.data
+                is Result.Error -> {
+                    // Manejar el error, si es necesario
+                }
+            }
+        }
+    }
+
 
     // Propiedad para almacenar el usuario autenticado actual
     private val _currentUser = MutableLiveData<FirebaseUser?>()
